@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+typedef struct {
+    int red;
+    int green;
+    int blue;
+} Color;
+
+typedef enum {
+    WALKING,
+    STEPPING_FORWARD
+} RobotMode;
+
+// 函数 识别黑色
+bool detectBlackColor(Color detectedColor) {
+    // 红=绿=蓝=0 黑色
+    if (detectedColor.red == 0 && detectedColor.green == 0 && detectedColor.blue == 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// 函数 行走->踏步前进
+void transformMode(bool condition, RobotMode *mode) {
+    if (condition) {
+        // True 踏步前进
+        *mode = STEPPING_FORWARD;
+    } else {
+        // False 保持行走
+        *mode = WALKING;
+    }
+}
+
+int main() {
+    RobotMode currentMode = WALKING;
+
+    while (true) {
+        Color detectedColor = {0, 0, 0}; // 红、绿、蓝都为0表示黑色
+
+        if (detectBlackColor(detectedColor)) {
+            transformMode(true, &currentMode);
+        } else {
+            transformMode(false, &currentMode);
+        }
+
+        if (currentMode == WALKING) {
+            printf("Robot is in walking mode.\n");
+        } else if (currentMode == STEPPING_FORWARD) {
+            printf("Robot is stepping forward.\n");
+        }
+    }
+
+    return 0;
+}
