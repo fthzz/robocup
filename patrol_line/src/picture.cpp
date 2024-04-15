@@ -1,16 +1,54 @@
-#include"line.hpp"
-#include<opencv2/opencv.hpp>
+#include"picture.hpp"
 
 using namespace std;
 using namespace cv;
 
 extern Point flag1,flag2;
 
-double line_length(Point pt1,Point pt2){
+double Picture::getAngle(Mat picture,Point pt1,Point pt2){
+    Point pt3;
+    if(pt1.y < pt2.y){
+        Point t;
+        t = pt1;
+        pt1 = pt2;
+        pt2 = t;
+    }
+    pt3.x = pt2.x - pt1.x;
+    pt3.y = pt2.y - pt1.y;
+    double son = -(pt3.y);
+    double mother = pow(pow(pt3.x,2)+pow(pt3.y,2),0.5);
+    double angle = acos(son/mother);
+    double degree = angle * 180.0 / M_PI;
+    return degree;
+}
+
+double Picture::getDistance(Mat picture,Point pt1,Point pt2){
+    double k,b,x0,y0;
+    double son1,mother1,son2,mother2,distance1,distance2;
+    double angle,degree;
+    pt1.x = -1 * pt1.x;
+    pt2.x = -1 * pt2.x;
+    k = (pt2.y - pt1.y) / (pt2.x - pt1.x);
+    b = pt1.y - k * pt1.x;
+    x0 = -1 * (picture.rows / 2);
+    y0 = picture.cols / 2;
+    son1 = abs(k * x0 - y0 + b);
+    mother1 = pow(1+pow(k,2),0.5);
+    distance1 = son1 / mother1;
+    son2 = abs(1 / k);
+    mother2 = pow(1+pow(1/k,2),0.5);
+    angle = acos(son2 / mother2);
+    degree = angle * 180.0 / M_PI;
+    distance2 = distance1 * sin(angle);
+    return distance2;
+}
+
+double Picture::line_length(Point pt1,Point pt2){
     double length = pow(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2),0.5);
     return length;
 }
-void drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
+
+void Picture::drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
     Point pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8;
     double linelength1 = 999999999;
     double linelength2 = 0;
