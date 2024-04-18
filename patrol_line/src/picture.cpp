@@ -3,9 +3,7 @@
 using namespace std;
 using namespace cv;
 
-extern Point flag1,flag2;
-
-double Picture::getAngle(Mat picture,Point pt1,Point pt2){
+double Picture::getAngle(Point pt1,Point pt2){
     Point pt3;
     if(pt1.y < pt2.y){
         Point t;
@@ -43,7 +41,7 @@ double Picture::getDistance(Mat picture,Point pt1,Point pt2){
     return distance2;
 }
 
-double Picture::line_length(Point pt1,Point pt2){
+double Picture::line_Length(Point pt1,Point pt2){
     double length = pow(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2),0.5);
     return length;
 }
@@ -67,19 +65,19 @@ void Picture::drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
         pt2.x = cvRound(x0-length*(-sin_value));
         pt2.y = cvRound(y0-length*(cos_value));
 
-        if(line_length(pt1,pt2) < linelength1){
+        if(line_Length(pt1,pt2) < linelength1){
             pt3.x = pt1.x;
             pt3.y = pt1.y;
             pt4.x = pt2.x;
             pt4.y = pt2.y;
-            linelength1 = line_length(pt1,pt2);
+            linelength1 = line_Length(pt1,pt2);
         }
-        if(line_length(pt1,pt2) > linelength2){
+        if(line_Length(pt1,pt2) > linelength2){
             pt5.x = pt1.x;
             pt5.y = pt1.y;
             pt6.x = pt2.x;
             pt6.y = pt2.y;
-            linelength2 = line_length(pt1,pt2);
+            linelength2 = line_Length(pt1,pt2);
         }
     }
     if(pt3.y * pt5.y < 0){
@@ -95,6 +93,28 @@ void Picture::drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
 
     line(img,pt7,pt8,Scalar(255),5);
 
-    flag1 = pt7;
-    flag2 = pt8;
+    this -> flag1 = pt7;
+    this -> flag2 = pt8;
+}
+
+void Picture::Prosess(){
+    Mat img = imread("the position of the picture",0);
+    resize(img,img,Size(0,0),0.2,0.2,INTER_LINEAR);
+    Mat img1,img2,kernel;
+    threshold(img,img1,200,255,THRESH_BINARY);
+    kernel = getStructuringElement(MORPH_RECT,Size(5,5));
+    morphologyEx(img1,img1,MORPH_OPEN,kernel);
+    morphologyEx(img1,img1,MORPH_CLOSE,kernel);
+    threshold(img1,img2,10,200,THRESH_BINARY);
+    vector<Vec2f>lines1;
+    vector<Vec2f>lines2;
+    HoughLines(img2,lines1,1,CV_PI/180,300);
+    drawLine(img2,img2.rows,img2.cols,lines1);
+    this -> img = img2;
+}
+
+void Picture::Patrol_line(){
+    Prosess();
+    this -> angle = getAngle(flag1,flag2);
+    this -> distance = getDistance(img,flag1,flag2);
 }
