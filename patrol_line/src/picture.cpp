@@ -3,7 +3,7 @@
 using namespace std;
 using namespace cv;
 
-double Picture::getAngle(Point pt1,Point pt2){
+double Patrol::getAngle(Point pt1, Point pt2) {
     Point pt3;
     if(pt1.y < pt2.y){
         Point t;
@@ -14,13 +14,13 @@ double Picture::getAngle(Point pt1,Point pt2){
     pt3.x = pt2.x - pt1.x;
     pt3.y = pt2.y - pt1.y;
     double son = -(pt3.y);
-    double mother = pow(pow(pt3.x,2)+pow(pt3.y,2),0.5);
-    double angle = acos(son/mother);
+    double mother = pow(pow(pt3.x, 2) + pow(pt3.y, 2), 0.5);
+    double angle = acos(son / mother);
     double degree = angle * 180.0 / M_PI;
     return degree;
 }
 
-double Picture::getDistance(Mat picture,Point pt1,Point pt2){
+double Patrol::getDistance(Mat picture,Point pt1,Point pt2){
     double k,b,x0,y0;
     double son1,mother1,son2,mother2,distance1,distance2;
     double angle,degree;
@@ -41,12 +41,12 @@ double Picture::getDistance(Mat picture,Point pt1,Point pt2){
     return distance2;
 }
 
-double Picture::line_Length(Point pt1,Point pt2){
+double Patrol::line_Length(Point pt1,Point pt2){
     double length = pow(pow((pt1.x - pt2.x),2) + pow((pt1.y - pt2.y),2),0.5);
     return length;
 }
 
-void Picture::drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
+void Patrol::drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
     Point pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8;
     double linelength1 = 999999999;
     double linelength2 = 0;
@@ -97,9 +97,9 @@ void Picture::drawLine(Mat img,double rows,double cols,vector<Vec2f> lines){
     this -> flag2 = pt8;
 }
 
-void Picture::Prosess(){
-    Mat img = imread("the position of the picture",0);
-    resize(img,img,Size(0,0),0.2,0.2,INTER_LINEAR);
+void Patrol::Prosess(Mat &src){
+    Mat img;
+    resize(src,img,Size(0,0),0.2,0.2,INTER_LINEAR);
     Mat img1,img2,kernel;
     threshold(img,img1,200,255,THRESH_BINARY);
     kernel = getStructuringElement(MORPH_RECT,Size(5,5));
@@ -113,8 +113,8 @@ void Picture::Prosess(){
     this -> img = img2;
 }
 
-void Picture::Patrol_line(){
-    Prosess();
+void Patrol::patrolLine(Mat &src) {
+    Prosess(src);
     this -> angle = getAngle(flag1,flag2);
     this -> distance = getDistance(img,flag1,flag2);
 }
