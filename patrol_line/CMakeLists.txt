@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 project(patrol_line)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(OpenCV)
 
